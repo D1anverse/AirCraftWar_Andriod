@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="@android:color/black">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="飞机大战"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:layout_marginBottom="48dp"/>
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入用户名"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/white"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择难度"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radio_group_difficulty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/radio_easy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="简单"
+            android:textColor="@android:color/white"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="普通"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="24dp"/>
+
+        <RadioButton
+            android:id="@+id/radio_hard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="困难"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="24dp"/>
+    </RadioGroup>
+
+    <CheckBox
+        android:id="@+id/cb_music"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开启音乐"
+        android:textColor="@android:color/white"
+        android:checked="true"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="开始游戏"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/btn_rank"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="排行榜"
+        android:textSize="20sp"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
