@@ -33,6 +33,8 @@ public class MenuActivity extends AppCompatActivity {
         btnStart = findViewById(R.id.btn_start);
         btnRank = findViewById(R.id.btn_rank);
 
+        etUsername.setText("Player");
+
         btnStart.setOnClickListener(v -> {
             String username = etUsername.getText().toString().trim();
             if (username.isEmpty()) {
@@ -48,7 +50,6 @@ public class MenuActivity extends AppCompatActivity {
             boolean musicOn = cbMusic.isChecked();
             String musicMode = musicOn ? "ON" : "OFF";
 
-            // 跳转到英雄机选取界面，而不是直接进入游戏
             Intent intent = new Intent(this, HeroSelectActivity.class);
             intent.putExtra("username", username);
             intent.putExtra("difficulty", difficulty);

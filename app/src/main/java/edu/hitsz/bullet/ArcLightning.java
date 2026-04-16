@@ -11,69 +11,52 @@ import edu.hitsz.application.ImageManager;
  */
 public class ArcLightning extends BaseBullet {
 
-    // 弧形摆动参数
-    private float arcPhase;      // 弧形相位
-    private float arcAmplitude;  // 弧形幅度
-    private float arcFrequency;  // 弧形频率
-    private int baseLocationX;   // 基准X坐标
+    private float arcPhase;
+    private float arcAmplitude;
+    private float arcFrequency;
+    private int baseLocationX;
+    private int collisionWidth;
 
     public ArcLightning(int locationX, int locationY, int speedX, int speedY, int power) {
         super(locationX, locationY, speedX, speedY, power);
         this.baseLocationX = locationX;
         this.arcPhase = 0;
-        this.arcAmplitude = 50;  // 横向摆动幅度
-        this.arcFrequency = 0.1f; // 摆动频率
+        this.arcAmplitude = 50;
+        this.arcFrequency = 0.1f;
+        this.collisionWidth = 450;
     }
 
     @Override
     public void forward() {
-        // 更新相位
         arcPhase += arcFrequency;
-
-        // Y轴正常移动
         locationY += speedY;
-
-        // X轴产生弧形摆动效果
         locationX = (int)(baseLocationX + Math.sin(arcPhase) * arcAmplitude);
 
-        // 判定出界
         if (locationY <= 0) {
-            vanish();
+            realVanish();
         }
     }
 
-    /**
-     * 弧状闪电可以穿透敌人
-     * 碰撞后不会消失
-     */
     @Override
     public void vanish() {
-        // 默认不消失，穿透效果
-        // 只有出界时才真正消失
     }
 
-    /**
-     * 强制消失（出界时调用）
-     */
     public void realVanish() {
         super.vanish();
     }
 
-    /**
-     * 是否可以穿透
-     */
     public boolean canPenetrate() {
         return true;
     }
 
     @Override
     public int getWidth() {
-        return 30;  // 闪电宽度
+        return collisionWidth;
     }
 
     @Override
     public int getHeight() {
-        return 60;  // 闪电高度
+        return 60;
     }
 
     @Override

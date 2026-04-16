@@ -178,16 +178,23 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             // 射击
             shootAction();
 
-            for (BaseBullet bullet : heroBullets) {
-                if (bullet instanceof LaserBullet) {
-                    bullet.setLocation(
-                            heroAircraft.getLocationX(),
-                            heroAircraft.getLocationY()/2  // 激光从屏幕顶部开始
-                    );
-                }
-            }
             // 难度提升
             increaseDifficulty();
+        }
+
+        // ===== 每帧都更新激光位置，解决延迟问题 =====
+        for (BaseBullet bullet : heroBullets) {
+            if (bullet instanceof LaserBullet) {
+                // 激光从飞机顶部发射
+                int heroImageHeight = heroAircraft.getHeroImage() != null 
+                        ? heroAircraft.getHeroImage().getHeight() : 0;
+                int laserStartY = heroAircraft.getLocationY() - heroImageHeight / 2;
+                
+                bullet.setLocation(
+                        heroAircraft.getLocationX(),
+                        laserStartY
+                );
+            }
         }
 
         // 技能持续时间更新
@@ -271,17 +278,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         for (AbstractFlyingObject obj : objects) {
             android.graphics.Bitmap bmp = obj.getImage();
             if (bmp != null) {
-                // 激光特殊绘制：从飞机位置向上重复绘制直至屏幕顶端
+                // 激光特殊绘制：使用Canvas绘制光线
                 if (obj instanceof LaserBullet) {
-                    LaserBullet laser = (LaserBullet) obj;
-                    int laserX = obj.getLocationX() - bmp.getWidth() / 2;
-                    int currentY = obj.getLocationY(); // 从飞机位置开始
-
-                    // 向上重复绘制激光图片，直到到达屏幕顶端
-                    while (currentY > -bmp.getHeight()) {
-                        canvas.drawBitmap(bmp, laserX, currentY - bmp.getHeight() / 2, null);
-                        currentY -= bmp.getHeight();
-                    }
+                    drawLaserBeam(canvas, obj);
                 } else {
                     // 普通对象的绘制
                     canvas.drawBitmap(bmp,
@@ -291,6 +290,48 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 }
             }
         }
+    }
+
+    /**
+     * 绘制激光束 - 使用Canvas绘制，不依赖图片
+     */
+    private void drawLaserBeam(Canvas canvas, AbstractFlyingObject laser) {
+        int laserX = laser.getLocationX();
+        int startY = laser.getLocationY();  // 从飞机位置开始
+        int endY = 0;  // 到屏幕顶端
+
+        // 外层：粗的半透明光晕（青色）
+        Paint outerPaint = new Paint();
+        outerPaint.setColor(0x4400FFFF);  // 半透明青色
+        outerPaint.setStrokeWidth(24);
+        outerPaint.setAntiAlias(true);
+        outerPaint.setStyle(Paint.Style.STROKE);
+        outerPaint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(laserX, startY, laserX, endY, outerPaint);
+
+        // 中层：中等亮度的核心
+        Paint midPaint = new Paint();
+        midPaint.setColor(0xAA00FFFF);  // 较亮青色
+        midPaint.setStrokeWidth(12);
+        midPaint.setAntiAlias(true);
+        midPaint.setStyle(Paint.Style.STROKE);
+        midPaint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(laserX, startY, laserX, endY, midPaint);
+
+        // 内层：最亮的白色核心
+        Paint corePaint = new Paint();
+        corePaint.setColor(0xFFFFFFFF);  // 白色
+        corePaint.setStrokeWidth(4);
+        corePaint.setAntiAlias(true);
+        corePaint.setStyle(Paint.Style.STROKE);
+        corePaint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(laserX, startY, laserX, endY, corePaint);
+
+        // 飞机发射点的高光效果
+        Paint glowPaint = new Paint();
+        glowPaint.setColor(0xFFFFFFFF);
+        glowPaint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(laserX, startY, 8, glowPaint);
     }
 
     protected void drawScoreAndLife(Canvas canvas) {
@@ -321,7 +362,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 canvas.drawText(skillName + " 激活中!", 10, 200, paint);
             } else if (activeSkill.canUse()) {
                 paint.setColor(Color.GREEN);
-                canvas.drawText(skillName + " [双击释放]", 10, 200, paint);
+                canvas.drawText(skillName + " [点击释放]", 10, 200, paint);
             } else {
                 paint.setColor(Color.GRAY);
                 int percent = (energy * 100) / maxEnergy;
@@ -408,17 +449,17 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 mobHp += gameLevel;
                 eliteHp += gameLevel * 2;
                 superEliteHp += gameLevel * 3;
-                System.out.println("-------敌机属性提升！-------\n" + "普通敌人：" + mobHp + "\n" + "精英敌人：" + eliteHp + "\n" + "超级敌人：" + superEliteHp + "\n");
+                System.out.println("敌机属性提升: " + "普通:" + mobHp + " 精英:" + eliteHp + " 超级:" + superEliteHp);
             }
             // 每分钟，增加飞机数量，上限10
             if (difficultyRate % 100 == 0 && enemyMaxNumber <= 10) {
                 enemyMaxNumber += gameLevel;
-                System.out.println("-------敌机数量上限提升！-------\n" + "当前数量上限：" + enemyMaxNumber + "\n");
+                System.out.println("敌机数量上限提升: " + enemyMaxNumber);
             }
             // 每30s，降低射速,上限10次
             if (difficultyRate % 50 == 0 && difficultyRate <= 500) {
                 heroAircraft.addInterval(gameLevel * 100);
-                System.out.println("-------英雄机射速降低！-------\n"+"当前射击间隔(小于600取600)：" + heroAircraft.getInterval() + "\n");
+                System.out.println("英雄机射速提升: " + heroAircraft.getInterval());
             }
         }
     }
@@ -467,6 +508,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         if (heroAircraft.getEffectTimer() > 0) {
             heroAircraft.effectTimerUpdate(timeInterval);
         } else if (!heroAircraft.isReset) {
+            // 道具效果结束时，移除激光子弹
+            heroBullets.removeIf(bullet -> bullet instanceof LaserBullet);
             heroAircraft.resetStrategy();
         }
     }

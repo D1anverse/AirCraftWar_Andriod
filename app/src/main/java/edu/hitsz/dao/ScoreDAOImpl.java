@@ -9,10 +9,23 @@ import java.util.*;
 public class ScoreDAOImpl implements DAO {
     private ScoreDatabaseHelper dbHelper;
     private Context context;
+    private String currentDifficulty = "normal";
 
     public ScoreDAOImpl(Context context) {
         this.context = context.getApplicationContext();
         dbHelper = new ScoreDatabaseHelper(this.context);
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.currentDifficulty = difficulty;
+    }
+
+    public String getDifficulty() {
+        return currentDifficulty;
+    }
+
+    private String getTableName() {
+        return ScoreDatabaseHelper.getTableName(currentDifficulty);
     }
 
     @Override
@@ -22,7 +35,7 @@ public class ScoreDAOImpl implements DAO {
         values.put(ScoreDatabaseHelper.COLUMN_USERNAME, score.getUsername());
         values.put(ScoreDatabaseHelper.COLUMN_SCORE, score.getScore());
         values.put(ScoreDatabaseHelper.COLUMN_TIME, score.getTime());
-        long id = db.insert(ScoreDatabaseHelper.TABLE_SCORES, null, values);
+        long id = db.insert(getTableName(), null, values);
         score.setId((int) id);
         db.close();
     }
@@ -31,7 +44,7 @@ public class ScoreDAOImpl implements DAO {
     public List<Score> getAllScores() {
         List<Score> scoreList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ScoreDatabaseHelper.TABLE_SCORES,
+        Cursor cursor = db.query(getTableName(),
                 null, null, null, null, null, null);
 
         if (cursor.moveToFirst()) {
@@ -50,7 +63,7 @@ public class ScoreDAOImpl implements DAO {
 
     public void deleteScore(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(ScoreDatabaseHelper.TABLE_SCORES,
+        db.delete(getTableName(),
                 ScoreDatabaseHelper.COLUMN_ID + " = ?",
                 new String[]{String.valueOf(id)});
         db.close();
@@ -59,7 +72,15 @@ public class ScoreDAOImpl implements DAO {
     @Override
     public void clearAllScores() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(ScoreDatabaseHelper.TABLE_SCORES, null, null);
+        db.delete(getTableName(), null, null);
+        db.close();
+    }
+
+    public void clearAllDifficulties() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(ScoreDatabaseHelper.TABLE_EASY, null, null);
+        db.delete(ScoreDatabaseHelper.TABLE_NORMAL, null, null);
+        db.delete(ScoreDatabaseHelper.TABLE_HARD, null, null);
         db.close();
     }
 
@@ -67,7 +88,7 @@ public class ScoreDAOImpl implements DAO {
     public List<Score> getTopScores(int topN) {
         List<Score> scoreList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ScoreDatabaseHelper.TABLE_SCORES,
+        Cursor cursor = db.query(getTableName(),
                 null, null, null, null, null,
                 ScoreDatabaseHelper.COLUMN_SCORE + " DESC",
                 String.valueOf(topN));
@@ -90,7 +111,7 @@ public class ScoreDAOImpl implements DAO {
     public List<Score> getScoresByUsername(String username) {
         List<Score> scoreList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ScoreDatabaseHelper.TABLE_SCORES,
+        Cursor cursor = db.query(getTableName(),
                 null,
                 ScoreDatabaseHelper.COLUMN_USERNAME + " = ?",
                 new String[]{username},
@@ -111,13 +132,12 @@ public class ScoreDAOImpl implements DAO {
         return scoreList;
     }
 
-    // 其他方法实现...
     @Override
-    public void printAllScores() { /* 无需实现 */ }
+    public void printAllScores() { }
 
     @Override
-    public void printLeaderboard(int topN) { /* 无需实现 */ }
+    public void printLeaderboard(int topN) { }
 
     @Override
-    public void printUserScores(String username) { /* 无需实现 */ }
+    public void printUserScores(String username) { }
 }

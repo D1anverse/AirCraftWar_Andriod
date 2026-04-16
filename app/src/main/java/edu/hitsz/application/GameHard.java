@@ -24,7 +24,7 @@ public class GameHard extends Game {
             // 每次生成Boss后缩短生成间隔（不低于300）
             if (bossInterval > 300) {
                 bossInterval -= 30;
-                System.out.println("-------Boss生成间隔降低！-------\n"+"Boss生成间隔："+bossInterval+"\n");
+                System.out.println("Boss生成间隔降低: " + bossInterval);
             }
             // Boss血量随出现次数递增
             int bossHp = 600 + bossCounter * 100;
@@ -37,7 +37,7 @@ public class GameHard extends Game {
             playSoundManager.stopBgm();
             playSoundManager.playBgmBoss();
             bossCounter++;
-            System.out.println("-------Boss血量提升！-------\n"+"Boss血量："+bossHp+"\n");
+            System.out.println("Boss血量提升: " + bossHp);
         } else if (isBossExist) {
             lastBossScore = score;
         }

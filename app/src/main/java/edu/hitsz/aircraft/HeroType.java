@@ -42,7 +42,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "基础型号\n生命值: 100\n攻击力: 30\n特点: 均衡型";
+            return "基础型号\n均衡型";
         }
 
         @Override
@@ -74,7 +74,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "进阶型号\n生命值: 150\n攻击力: 40\n特点: 大范围子弹，增强回血，弧状闪电技能";
+            return "进阶型号\n大范围子弹\n雷霆一击技能";
         }
 
         @Override
@@ -84,7 +84,7 @@ public enum HeroType {
 
         @Override
         public ActiveSkill createActiveSkill() {
-            return new ArcLightningSkill(80);
+            return new ArcLightningSkill(300); // 提高伤害
         }
     },
 
@@ -106,7 +106,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "旗舰型号\n生命值: 200\n攻击力: 50\n特点: 双翼射击，激光模式，护盾技能";
+            return "旗舰型号\n双翼射击\n激光模式\n护盾技能";
         }
 
         @Override

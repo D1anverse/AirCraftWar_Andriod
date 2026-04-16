@@ -11,6 +11,7 @@ import edu.hitsz.R;
 
 public class GameActivity extends AppCompatActivity implements Game.GameOverListener {
     private Game gameView;
+    private String difficulty = "normal";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +19,12 @@ public class GameActivity extends AppCompatActivity implements Game.GameOverList
 
         Intent intent = getIntent();
         String username = intent.getStringExtra("username");
-        String difficulty = intent.getStringExtra("difficulty");
+        difficulty = intent.getStringExtra("difficulty");
         String musicMode = intent.getStringExtra("musicMode");
+
+        if (difficulty == null) {
+            difficulty = "normal";
+        }
 
         switch (difficulty) {
             case "easy":
@@ -54,6 +59,7 @@ public class GameActivity extends AppCompatActivity implements Game.GameOverList
         Intent intent = new Intent(this, ScoreActivity.class);
         intent.putExtra("score", score);
         intent.putExtra("userName", userName);
+        intent.putExtra("difficulty", difficulty);
         startActivity(intent);
         finish();
     }

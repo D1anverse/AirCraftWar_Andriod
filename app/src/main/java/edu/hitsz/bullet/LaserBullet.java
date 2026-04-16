@@ -8,35 +8,35 @@ import edu.hitsz.application.ImageManager;
 
 /**
  * 激光子弹 - ProMax版火力道具触发
- * 穿透敌人，持续伤害
+ * 穿透敌人，每帧持续伤害
  */
 public class LaserBullet extends BaseBullet {
     private int laserWidth;
     private int laserHeight;
-    private int damageInterval; // 伤害间隔
-    private long lastDamageTime;
+    private int frameDamageCount; // 每帧累积伤害计数
+    private int damagePerFrame = 5; // 每帧累积伤害
 
     public LaserBullet(int locationX, int locationY, int power) {
         super(locationX, locationY, 0, 0, power);
         this.laserWidth = 20;
         this.laserHeight = GameConfig.getInstance().getScreenHeight();
-        this.damageInterval = 100; // 每100ms造成一次伤害
-        this.lastDamageTime = 0;
+        this.frameDamageCount = 0;
     }
 
     @Override
     public void forward() {
         // 激光不移动，跟随英雄机
         // 位置在Game中更新
+        // 每帧累积伤害
+        frameDamageCount += damagePerFrame;
     }
 
     /**
-     * 激光是否可以造成伤害
+     * 激光每帧都可以造成累积的伤害
      */
     public boolean canDamage() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastDamageTime >= damageInterval) {
-            lastDamageTime = currentTime;
+        if (frameDamageCount >= 30) {  // 每累积30点伤害造成一次判定
+            frameDamageCount = 0;  // 重置累积计数
             return true;
         }
         return false;
