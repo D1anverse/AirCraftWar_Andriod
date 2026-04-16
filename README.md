@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-本项目是一个 Android 平台的飞行射击游戏，玩家控制战机击败敌机获取分数，支持多种难度模式和特色英雄机类型。
+本项目基于哈尔滨工业大学（深圳）的软件构造实验开发项目，是一款Android平台的飞行射击游戏，玩家控制战机击败敌机获取分数，支持多种难度模式和特色英雄机类型，未来将会支持网络功能。
 
 ---
 
@@ -122,8 +122,6 @@ public boolean crash(AbstractFlyingObject flyingObject) {
 }
 ```
 
-飞机类使用 `factor=2` 缩小纵向碰撞区域，模拟飞机较薄的特性。
-
 ### 3. 射击策略系统（策略模式）
 
 ```java
@@ -168,8 +166,6 @@ public interface BulletFactory {
 }
 ```
 
-工厂模式使新增敌机类型或子弹类型时无需修改已有代码。
-
 ### 5. 技能系统
 
 主动技能支持能量充能、冷却时间、持续时间：
@@ -191,26 +187,24 @@ public class ActiveSkill implements Skill {
 
 ## 开发模式分析
 
-### 1. 策略模式（Strategy Pattern）
+### 1. 策略模式
 
 **应用场景**：射击策略系统
 ```java
-HeroAircraft 持有 ShootStrategy 引用
-    ↓
-不同策略实现：ShootStraight, ShootDoubleWing, ShootLaser...
+HeroAircraft 持有ShootStrategy引用
+    
+不同策略实现:ShootStraight, ShootDoubleWing, ShootLaser...
 ```
-**优势**：射击行为可动态切换，无需修改飞机类
 
-### 2. 工厂模式（Factory Pattern）
+### 2. 工厂模式
 
 **应用场景**：敌机生成、子弹创建
 ```java
 AbstractEnemy enemy = new EliteEnemyFactory().createEnemy(hp);
 BaseBullet bullet = new HeroBulletFactory().createBullet(...);
 ```
-**优势**：解耦对象创建过程，便于扩展新类型
 
-### 3. 观察者模式（Observer Pattern）
+### 3. 观察者模式
 
 **应用场景**：炸弹道具全屏伤害
 ```java
@@ -221,9 +215,8 @@ public void useBomb() {
     }
 }
 ```
-**优势**：道具效果可广播给所有观察者
 
-### 4. 模板方法模式（Template Method）
+### 4. 模板方法模式
 
 **应用场景**：不同难度的游戏类继承 Game
 ```java
@@ -232,24 +225,22 @@ abstract class Game {
     // 其他逻辑由父类控制
 }
 ```
-**优势**：公共逻辑复用，差异部分由子类实现
 
-### 5. 单例模式（Singleton Pattern）
+### 5. 单例模式
 
 **应用场景**：英雄机、游戏配置
 ```java
 private static final HeroAircraft instance = new HeroAircraft();
 public static HeroAircraft getInstance() { return instance; }
 ```
-**优势**：全局唯一实例，避免多实例冲突
 
 ---
 
-## Android 与 PC 开发的差异
+## Android与 PC开发的差异
 
-本项目原本为 Java PC 游戏，后迁移至 Android 平台，主要差异如下：
+本项目原本为Java PC游戏，后迁移至Android平台，主要差异如下：
 
-### 1. 图形渲染
+### 1.图形渲染
 
 | 方面 | PC版（Java Swing） | Android版 |
 |------|-------------------|----------|
@@ -269,14 +260,6 @@ public void run() {
     }
 }
 ```
-
-### 2. 用户输入
-
-| 方面 | PC版 | Android版 |
-|------|------|----------|
-| 英雄机控制 | 键盘方向键/WASD | 触摸拖动 |
-| 技能触发 | 键盘快捷键 | 点击技能按钮 |
-| 射击控制 | 空格键/自动射击 | 自动射击 |
 
 ```java
 // Android: 触摸事件处理
@@ -298,7 +281,7 @@ public boolean onTouchEvent(MotionEvent event) {
 }
 ```
 
-### 3. 数据持久化
+### 2.数据持久化
 
 | 方面 | PC版 | Android版 |
 |------|------|----------|
@@ -315,7 +298,7 @@ public class ScoreDatabaseHelper extends SQLiteOpenHelper {
 }
 ```
 
-### 4. 生命周期
+### 3.生命周期
 
 | 方面 | PC版 | Android版 |
 |------|------|----------|
@@ -334,7 +317,7 @@ protected void onPause() {
 }
 ```
 
-### 5. 音效播放
+### 4.音效播放
 
 | 方面 | PC版 | Android版 |
 |------|------|----------|
@@ -375,7 +358,3 @@ public void playBgm() {
 3. 点击运行按钮
 
 ---
-
-## License
-
-MIT License
