@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import edu.hitsz.application.GameConfig;
 import edu.hitsz.application.ImageManager;
 import edu.hitsz.R;
+import edu.hitsz.network.OnlineLobbyActivity;
 
 public class MenuActivity extends AppCompatActivity {
     private EditText etUsername;
@@ -59,6 +60,24 @@ public class MenuActivity extends AppCompatActivity {
 
         btnRank.setOnClickListener(v -> {
             startActivity(new Intent(this, ScoreActivity.class));
+        });
+
+        Button btnOnline = findViewById(R.id.btn_online);
+        btnOnline.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            if (username.isEmpty()) {
+                Toast.makeText(this, "请输入用户名", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            boolean musicOn = cbMusic.isChecked();
+            String musicMode = musicOn ? "ON" : "OFF";
+
+            Intent intent = new Intent(this, HeroSelectActivity.class);
+            intent.putExtra("username", username);
+            intent.putExtra("difficulty", "normal");
+            intent.putExtra("musicMode", musicMode);
+            intent.putExtra("isOnlineMode", true);
+            startActivity(intent);
         });
     }
 }

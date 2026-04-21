@@ -40,6 +40,21 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         void onGameOver(int score, String userName);
     }
 
+    /**
+     * 分数变化监听器 - 用于联机模式下实时同步分数
+     */
+    public interface OnScoreChangedListener {
+        /** 分数发生变化时回调 */
+        void onScoreChanged(int currentScore);
+    }
+
+    protected OnScoreChangedListener scoreChangedListener;  // 成员变量
+
+    /** 外部设置监听器的方法 */
+    public void setOnScoreChangedListener(OnScoreChangedListener listener) {
+        this.scoreChangedListener = listener;
+    }
+
     protected GameOverListener listener;
     protected SurfaceHolder holder;
     protected Thread gameThread;
@@ -49,6 +64,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     // 游戏数据
     protected HeroAircraft heroAircraft;
+
+    private Integer enemyScoreForDisplay = null;
     protected List<AbstractEnemy> enemyAircrafts;
     protected List<BaseBullet> heroBullets;
     protected List<BaseBullet> enemyBullets;
@@ -87,6 +104,14 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     protected String userName;
 
+    public void setEnemyScore(int score) {
+        this.enemyScoreForDisplay = score;
+    }
+
+    public void clearEnemyScore() {
+        this.enemyScoreForDisplay = null;
+    }
+
     public Game(Context context, String musicMode, String userName, GameOverListener listener) {
         super(context);
         this.context = context;
@@ -114,7 +139,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         playSoundManager = new PlaySoundManager(context, musicMode.equals("ON"));
     }
 
-    // ---------- SurfaceHolder.Callback ----------
+    // SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         isRunning = true;
@@ -139,7 +164,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    // ---------- Runnable (游戏循环) ----------
+    // Runnable (游戏循环)
     @Override
     public void run() {
         while (isRunning) {
@@ -341,6 +366,16 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText("SCORE: " + score, 10, 50, paint);
         canvas.drawText("LIFE: " + heroAircraft.getHp(), 10, 100, paint);
 
+
+        if (enemyScoreForDisplay != null) {
+            Paint enemyPaint = new Paint();
+            enemyPaint.setColor(Color.CYAN);
+            enemyPaint.setTextSize(36);
+            // 在右侧绘制 EnemyScore
+            float enemyX = screenWidth - 280;
+            canvas.drawText("ENEMY: " + enemyScoreForDisplay, enemyX, 50, enemyPaint);
+        }
+
         // 显示道具效果时间
         float effect = heroAircraft.getEffectTimer() / 1000f;
         if (effect > 0) {
@@ -371,7 +406,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    // ---------- 触摸事件 ----------
+    // 触摸事件
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
@@ -421,7 +456,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-    // ---------- 游戏逻辑（保持原有方法，但需适配Android）----------
+    // 游戏逻辑
     protected void checkForBossSpawn() {
         int deltaScore = score - lastBossScore;
         if (deltaScore > bossInterval && !isBossExist) {
@@ -567,6 +602,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                         }
                         droppedItems.addAll(enemy.spawnItems());
                         score += enemy.getScores();
+                        if (scoreChangedListener != null) {
+                            scoreChangedListener.onScoreChanged(score);
+                        }
                     }
                 }
 
@@ -594,6 +632,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 }
                 item.activateEffect(heroAircraft);
                 score += heroAircraft.getScores();
+                if (scoreChangedListener != null) {
+                    scoreChangedListener.onScoreChanged(score);
+                }
                 item.vanish();
             }
         }
@@ -725,6 +766,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         playSoundManager.playGameOver();
         try { Thread.sleep(800); } catch (InterruptedException e) { e.printStackTrace(); }
         playSoundManager.shutdown();
+
+        isRunning = false;
+
         if (listener != null) {
             listener.onGameOver(score, userName);
         }

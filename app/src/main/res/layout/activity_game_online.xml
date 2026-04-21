@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/game_online_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- 游戏画布容器 -->
+    <FrameLayout
+        android:id="@+id/game_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 右上角浮层：显示对手信息 -->
+    <LinearLayout
+        android:id="@+id/opponent_panel"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="55dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#CCFF4444"
+        android:elevation="6dp">
+
+        <!-- 对手标题 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[ENEMY INFO]"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- 对手昵称 -->
+        <TextView
+            android:id="@+id/tv_opponent_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            android:textColor="#FFFFDD"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp" />
+
+        <!-- 对手存活状态 -->
+        <TextView
+            android:id="@+id/tv_opponent_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[Alive]"
+            android:textColor="#88FF88"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- 对手实时分数 -->
+        <TextView
+            android:id="@+id/tv_enemy_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Score: 0"
+            android:textColor="#FFFF00"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginTop="6dp" />
+
+    </LinearLayout>
+
+    <!-- 左上角：联机状态指示灯 -->
+    <TextView
+        android:id="@+id/tv_conn_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:text="[Connected]"
+        android:textColor="#00FF00"
+        android:textSize="13sp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:background="#88000000" />
+
+</FrameLayout>

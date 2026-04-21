@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import edu.hitsz.aircraft.HeroType;
 import edu.hitsz.R;
+import edu.hitsz.network.OnlineLobbyActivity;
 
 public class HeroSelectActivity extends AppCompatActivity {
     private RadioGroup radioGroupHero;
@@ -63,13 +64,26 @@ public class HeroSelectActivity extends AppCompatActivity {
             // 保存选择的英雄机类型到 GameConfig
             GameConfig.getInstance().setSelectedHeroType(selectedHeroType);
 
-            // 跳转到游戏界面
-            Intent gameIntent = new Intent(HeroSelectActivity.this, GameActivity.class);
-            gameIntent.putExtra("username", username);
-            gameIntent.putExtra("difficulty", difficulty);
-            gameIntent.putExtra("musicMode", musicMode);
-            gameIntent.putExtra("heroType", selectedHeroType.getTypeId());
-            startActivity(gameIntent);
+            // 检查是否为联机模式
+            Intent srcIntent = getIntent();
+            boolean isOnlineMode = srcIntent.getBooleanExtra("isOnlineMode", false);
+
+            if (isOnlineMode) {
+                // 联机模式：跳转到联机大厅
+                Intent intent = new Intent(HeroSelectActivity.this, OnlineLobbyActivity.class);
+                intent.putExtra("musicMode", musicMode);
+                intent.putExtra("username", username);
+                intent.putExtra("heroType", selectedHeroType.getTypeId());
+                startActivity(intent);
+            } else {
+                // 普通模式：跳转到游戏界面
+                Intent gameIntent = new Intent(HeroSelectActivity.this, GameActivity.class);
+                gameIntent.putExtra("username", username);
+                gameIntent.putExtra("difficulty", difficulty);
+                gameIntent.putExtra("musicMode", musicMode);
+                gameIntent.putExtra("heroType", selectedHeroType.getTypeId());
+                startActivity(gameIntent);
+            }
             finish();
         });
 

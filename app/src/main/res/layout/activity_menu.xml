@@ -88,4 +88,13 @@
         android:text="排行榜"
         android:textSize="20sp"
         android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/btn_online"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="🌐 联机对战"
+        android:textSize="16sp"
+        android:backgroundTint="#9B59B6"
+        android:layout_marginTop="10dp" />
 </LinearLayout>
