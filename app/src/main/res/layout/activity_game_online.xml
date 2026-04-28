@@ -14,7 +14,7 @@
     <!-- 右上角浮层：显示对手信息 -->
     <LinearLayout
         android:id="@+id/opponent_panel"
-        android:layout_width="170dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:layout_marginTop="55dp"
@@ -22,7 +22,8 @@
         android:orientation="vertical"
         android:padding="12dp"
         android:background="#CCFF4444"
-        android:elevation="6dp">
+        android:elevation="6dp"
+        android:minWidth="160dp">
 
         <!-- 对手标题 -->
         <TextView
@@ -57,13 +58,15 @@
         <!-- 对手实时分数 -->
         <TextView
             android:id="@+id/tv_enemy_score"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Score: 0"
-            android:textColor="#FFFF00"
-            android:textSize="13sp"
+            android:textColor="#00BFFF"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="6dp" />
+            android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
     </LinearLayout>
 

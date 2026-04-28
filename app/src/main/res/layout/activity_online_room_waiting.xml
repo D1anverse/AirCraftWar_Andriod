@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#1a1a2e"
+    android:padding="32dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择难度"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="40dp" />
+
+    <!-- 难度选择 -->
+    <RadioGroup
+        android:id="@+id/rg_difficulty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_easy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="简单模式"
+            android:textColor="#88FF88"
+            android:textSize="20sp"
+            android:padding="12dp"
+            android:buttonTint="#88FF88" />
+
+        <RadioButton
+            android:id="@+id/rb_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="普通模式"
+            android:textColor="#FFFF88"
+            android:textSize="20sp"
+            android:padding="12dp"
+            android:buttonTint="#FFFF88" />
+
+        <RadioButton
+            android:id="@+id/rb_hard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="困难模式"
+            android:textColor="#FF8888"
+            android:textSize="20sp"
+            android:padding="12dp"
+            android:buttonTint="#FF8888" />
+
+    </RadioGroup>
+
+    <!-- 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#444444"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp" />
+
+    <!-- 状态显示 -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待选择难度..."
+        android:textColor="#AAAAAA"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 对手状态 -->
+    <LinearLayout
+        android:id="@+id/layout_opponent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="对手选择: "
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_opponent_difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            android:textColor="#00BFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- 匹配状态 -->
+    <TextView
+        android:id="@+id/tv_match_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待对手选择..."
+        android:textColor="#FFFF00"
+        android:textSize="18sp"
+        android:layout_marginTop="24dp"
+        android:visibility="gone" />
+
+    <!-- 确认按钮 -->
+    <Button
+        android:id="@+id/btn_confirm"
+        android:layout_width="240dp"
+        android:layout_height="56dp"
+        android:text="确认难度"
+        android:textSize="18sp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="#4CAF50" />
+
+    <!-- 返回按钮 -->
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="240dp"
+        android:layout_height="48dp"
+        android:text="返回"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#666666" />
+
+</LinearLayout>

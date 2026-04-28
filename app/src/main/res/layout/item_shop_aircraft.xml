@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="#252542"
+    android:layout_marginBottom="8dp">
+
+    <!-- 战机图标 -->
+    <View
+        android:id="@+id/view_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="#4A90D9"/>
+
+    <!-- 信息区：左侧图标固定宽度，右侧按钮固定宽度，中间信息区填满剩余空间 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:minHeight="64dp">
+
+        <TextView
+            android:id="@+id/tv_aircraft_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="进阶型战机"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_aircraft_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="大范围子弹 + 雷霆技能"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:layout_marginTop="2dp"
+            android:maxLines="2"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💰 5000"
+            android:textColor="#FFD700"
+            android:textSize="15sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- 购买/已拥有 按钮：固定宽度 -->
+    <Button
+        android:id="@+id/btn_buy"
+        android:layout_width="80dp"
+        android:layout_height="44dp"
+        android:text="购买"
+        android:textSize="13sp"
+        android:backgroundTint="#27AE60"
+        android:minHeight="0dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"/>
+</LinearLayout>

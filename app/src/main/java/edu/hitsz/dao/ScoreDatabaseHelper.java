@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class ScoreDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "game_scores.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String TABLE_EASY = "scores_easy";
     public static final String TABLE_NORMAL = "scores_normal";
@@ -15,6 +15,7 @@ public class ScoreDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USERNAME = "username";
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_TIME = "time";
+    public static final String TABLE_PLAYER_DATA = "player_data";
 
     private static final String CREATE_TABLE_EASY =
             "CREATE TABLE " + TABLE_EASY + " (" +
@@ -37,6 +38,15 @@ public class ScoreDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_SCORE + " INTEGER NOT NULL, " +
                     COLUMN_TIME + " TEXT NOT NULL)";
 
+    // 创建玩家数据表SQL
+    private static final String CREATE_TABLE_PLAYER_DATA =
+            "CREATE TABLE " + TABLE_PLAYER_DATA + " (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER NOT NULL UNIQUE, " +  // 对应服务器的用户ID
+                    "coins INTEGER DEFAULT 0, " +
+                    "unlocked_pro INTEGER DEFAULT 0, " +
+                    "unlocked_promax INTEGER DEFAULT 0)";
+
     public ScoreDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -46,14 +56,15 @@ public class ScoreDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_EASY);
         db.execSQL(CREATE_TABLE_NORMAL);
         db.execSQL(CREATE_TABLE_HARD);
+        db.execSQL(CREATE_TABLE_PLAYER_DATA);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EASY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NORMAL);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HARD);
-        onCreate(db);
+        if (oldVersion < 3) {
+            // 只追加新表，不动旧数据
+            db.execSQL(CREATE_TABLE_PLAYER_DATA);
+        }
     }
 
     public static String getTableName(String difficulty) {

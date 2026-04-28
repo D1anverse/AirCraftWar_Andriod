@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="@android:color/black">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="飞机大战"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:layout_marginBottom="48dp"/>
+
+    <EditText
+        android:id="@+id/et_nickname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="昵称"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/white"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="邮箱"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/white"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="密码"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/white"
+        android:inputType="textPassword"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- 登录/注册切换提示 -->
+    <TextView
+        android:id="@+id/tv_switch_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="还没有账号？点击注册"
+        android:textColor="#4A90D9"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="登 录"
+        android:textSize="20sp"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btn_skip"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="跳过（离线模式）"
+        android:textSize="14sp"
+        android:backgroundTint="#666666"
+        android:textColor="@android:color/white"/>
+</LinearLayout>

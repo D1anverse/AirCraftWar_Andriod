@@ -3,74 +3,97 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
+    android:gravity="center_horizontal"
+    android:padding="16dp"
     android:background="@android:color/black">
 
+    <!-- 标题 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="选择英雄机"
         android:textColor="@android:color/white"
-        android:textSize="32sp"
-        android:layout_marginBottom="32dp"/>
-
-    <ImageView
-        android:id="@+id/iv_hero_preview"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:scaleType="fitCenter"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"/>
 
+    <!-- 飞机预览图：缩小到 150dp -->
+    <ImageView
+        android:id="@+id/iv_hero_preview"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- 战机名称 -->
     <TextView
         android:id="@+id/tv_hero_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFF00"
-        android:textSize="24sp"
-        android:layout_marginBottom="8dp"/>
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="6dp"/>
 
-    <TextView
-        android:id="@+id/tv_hero_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:layout_marginBottom="32dp"/>
+    <!-- 描述：固定高度，超出滚动 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="12dp"
+        android:fillViewport="true">
+        <TextView
+            android:id="@+id/tv_hero_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#CCCCCC"
+            android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
+            android:gravity="center"/>
+    </ScrollView>
 
+    <!-- 单选组：固定间距不换行 -->
     <RadioGroup
         android:id="@+id/radio_group_hero"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="32dp">
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
 
         <RadioButton
             android:id="@+id/radio_hero_basic"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="基础型"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:gravity="center"/>
 
         <RadioButton
             android:id="@+id/radio_hero_pro"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="进阶型"
             android:textColor="@android:color/white"
-            android:checked="true"
-            android:layout_marginStart="24dp"/>
+            android:textSize="13sp"
+            android:gravity="center"
+            android:checked="true"/>
 
         <RadioButton
             android:id="@+id/radio_hero_promax"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="旗舰型"
             android:textColor="@android:color/white"
-            android:layout_marginStart="24dp"/>
+            android:textSize="13sp"
+            android:gravity="center"/>
     </RadioGroup>
 
+    <!-- 按钮组 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -79,17 +102,19 @@
 
         <Button
             android:id="@+id/btn_back"
-            android:layout_width="120dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="返回"
-            android:textSize="18sp"
-            android:layout_marginEnd="24dp"/>
+            android:textSize="16sp"
+            android:layout_marginEnd="16dp"/>
 
         <Button
             android:id="@+id/btn_confirm"
-            android:layout_width="120dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="开始战斗"
-            android:textSize="18sp"/>
+            android:textSize="16sp"/>
     </LinearLayout>
 </LinearLayout>

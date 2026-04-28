@@ -366,27 +366,30 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText("SCORE: " + score, 10, 50, paint);
         canvas.drawText("LIFE: " + heroAircraft.getHp(), 10, 100, paint);
 
-
+        // 对手分数放在右侧顶部
         if (enemyScoreForDisplay != null) {
             Paint enemyPaint = new Paint();
-            enemyPaint.setColor(Color.CYAN);
-            enemyPaint.setTextSize(36);
-            // 在右侧绘制 EnemyScore
-            float enemyX = screenWidth - 280;
-            canvas.drawText("ENEMY: " + enemyScoreForDisplay, enemyX, 50, enemyPaint);
+            enemyPaint.setColor(0xFF00BFFF); // 亮蓝色 (#00BFFF)
+            enemyPaint.setTextSize(36);  // 适当字号
+            enemyPaint.setFakeBoldText(true);
+            String text = "ENEMY: " + enemyScoreForDisplay;
+            float textWidth = enemyPaint.measureText(text);
+            float enemyX = screenWidth - textWidth - 20;  // 右侧留20px边距
+            canvas.drawText(text, enemyX, 50, enemyPaint);
         }
 
         // 显示道具效果时间
         float effect = heroAircraft.getEffectTimer() / 1000f;
         if (effect > 0) {
             paint.setColor(Color.YELLOW);
-            canvas.drawText("道具效果: " + effect + "s", 10, 150, paint);
+            paint.setTextSize(30);
+            canvas.drawText("道具效果: " + effect + "s", 10, 145, paint);
         }
 
         // 显示主动技能信息
         ActiveSkill activeSkill = heroAircraft.getActiveSkill();
         if (activeSkill != null) {
-            paint.setTextSize(35);
+            paint.setTextSize(30);
             paint.setColor(Color.CYAN);
             String skillName = activeSkill.getName();
             int energy = activeSkill.getEnergy();
@@ -394,14 +397,14 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
             if (activeSkill.isActive()) {
                 paint.setColor(Color.GREEN);
-                canvas.drawText(skillName + " 激活中!", 10, 200, paint);
+                canvas.drawText(skillName + " 激活中!", 10, 185, paint);
             } else if (activeSkill.canUse()) {
                 paint.setColor(Color.GREEN);
-                canvas.drawText(skillName + " [点击释放]", 10, 200, paint);
+                canvas.drawText(skillName + " [点击释放]", 10, 185, paint);
             } else {
                 paint.setColor(Color.GRAY);
                 int percent = (energy * 100) / maxEnergy;
-                canvas.drawText(skillName + " 充能: " + percent + "%", 10, 200, paint);
+                canvas.drawText(skillName + " 充能: " + percent + "%", 10, 185, paint);
             }
         }
     }

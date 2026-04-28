@@ -42,7 +42,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "基础型号\n均衡型";
+            return "基础型号 | 均衡型";
         }
 
         @Override
@@ -74,7 +74,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "进阶型号\n大范围子弹\n雷霆一击技能";
+            return "进阶型号 | 大范围子弹 | 雷霆技能";
         }
 
         @Override
@@ -106,7 +106,7 @@ public enum HeroType {
 
         @Override
         public String getDescription() {
-            return "旗舰型号\n双翼射击\n激光模式\n护盾技能";
+            return "旗舰型号 | 双翼射击 | 护盾技能";
         }
 
         @Override

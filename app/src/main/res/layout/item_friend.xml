@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp"
+    android:background="#252542"
+    android:layout_marginBottom="4dp">
+
+    <!-- 头像占位 -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="#4A90D9"
+        android:layout_marginEnd="12dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_friend_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="用户昵称"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_friend_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="在线"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <!-- 操作按钮区 -->
+    <Button
+        android:id="@+id/btn_invite"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:text="邀请对战"
+        android:textSize="12sp"
+        android:backgroundTint="#E67E22"
+        android:minHeight="0dp"
+        android:paddingHorizontal="12dp"/>
+
+    <Button
+        android:id="@+id/btn_add_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:text="添加好友"
+        android:textSize="12sp"
+        android:backgroundTint="#4CAF50"
+        android:minHeight="0dp"
+        android:paddingHorizontal="12dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"/>
+</LinearLayout>

@@ -3,17 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
     android:background="@android:color/black">
 
+    <!-- 标题 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="飞机大战"
         android:textColor="@android:color/white"
-        android:textSize="40sp"
-        android:layout_marginBottom="48dp"/>
+        android:textSize="36sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- 用户信息栏（新增）-->
+    <LinearLayout
+        android:id="@+id/layout_user_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="#222222">
+
+        <TextView
+            android:id="@+id/tv_user_nickname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="游客"
+            android:textColor="#AAAAAA"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tv_user_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💰 0"
+            android:textColor="#FFD700"
+            android:textSize="16sp"
+            android:paddingEnd="12dp"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/et_username"
@@ -23,22 +55,22 @@
         android:textColorHint="@android:color/darker_gray"
         android:textColor="@android:color/white"
         android:backgroundTint="@android:color/white"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="20dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="选择难度"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
-        android:layout_marginBottom="16dp"/>
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp"/>
 
     <RadioGroup
         android:id="@+id/radio_group_difficulty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="20dp">
 
         <RadioButton
             android:id="@+id/radio_easy"
@@ -54,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="普通"
             android:textColor="@android:color/white"
-            android:layout_marginStart="24dp"/>
+            android:layout_marginStart="20dp"/>
 
         <RadioButton
             android:id="@+id/radio_hard"
@@ -62,7 +94,7 @@
             android:layout_height="wrap_content"
             android:text="困难"
             android:textColor="@android:color/white"
-            android:layout_marginStart="24dp"/>
+            android:layout_marginStart="20dp"/>
     </RadioGroup>
 
     <CheckBox
@@ -72,29 +104,80 @@
         android:text="开启音乐"
         android:textColor="@android:color/white"
         android:checked="true"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="24dp"/>
 
+    <!-- 按钮区域（新增好友、商店按钮） -->
     <Button
         android:id="@+id/btn_start"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:layout_height="48dp"
         android:text="开始游戏"
-        android:textSize="20sp"/>
+        android:textSize="18sp"/>
 
     <Button
         android:id="@+id/btn_rank"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:layout_height="48dp"
         android:text="排行榜"
-        android:textSize="20sp"
-        android:layout_marginTop="16dp"/>
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 新增：商店按钮 -->
+    <Button
+        android:id="@+id/btn_shop"
+        android:layout_width="220dp"
+        android:layout_height="48dp"
+        android:text="🛒 商店"
+        android:textSize="18sp"
+        android:backgroundTint="#E67E22"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 新增：好友按钮 -->
+    <Button
+        android:id="@+id/btn_friends"
+        android:layout_width="220dp"
+        android:layout_height="48dp"
+        android:text="👥 好友"
+        android:textSize="18sp"
+        android:backgroundTint="#3498DB"
+        android:layout_marginTop="10dp"/>
 
     <Button
         android:id="@+id/btn_online"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_width="220dp"
+        android:layout_height="48dp"
         android:text="🌐 联机对战"
         android:textSize="16sp"
         android:backgroundTint="#9B59B6"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"/>
+
+    <!-- 新增：退出登录按钮 -->
+    <LinearLayout
+        android:id="@+id/layout_auth_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <!-- 已登录时显示：退出登录 -->
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:text="退出登录"
+            android:textSize="14sp"
+            android:backgroundTint="#555555"
+            android:textColor="@android:color/white"/>
+
+        <!-- 未登录（游客）时显示：去登录 -->
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:text="🔑 登录 / 注册"
+            android:textSize="14sp"
+            android:backgroundTint="#3498DB"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
 </LinearLayout>

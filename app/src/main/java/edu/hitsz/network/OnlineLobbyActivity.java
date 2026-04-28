@@ -144,12 +144,12 @@ public class OnlineLobbyActivity extends AppCompatActivity {
                         break;
 
                     case "OPPONENT_JOINED":
-                        // 对手找到了! 准备进入游戏
-                        tvStatus.setText("[MATCH] 对手 [" + body + "] 已就绪!\n即将进入对局...");
+                        // 对手找到了! 进入难度选择界面
+                        tvStatus.setText("[MATCH] 对手 [" + body + "] 已就绪!\n即将进入难度选择...");
                         tvStatus.setTextColor(Color.CYAN);
 
-                        // 延迟1.5秒后跳转到游戏界面
-                        tvStatus.postDelayed(() -> goToGame(playerName, body), 1500);
+                        // 延迟1.5秒后跳转到难度选择界面
+                        tvStatus.postDelayed(() -> goToRoomWaiting(playerName, body), 1500);
                         break;
 
                     case "ROOM_FULL":
@@ -192,6 +192,22 @@ public class OnlineLobbyActivity extends AppCompatActivity {
         intent.putExtra("opponentName", opponentName);
 
         // 新增：传递音乐设置和原始用户名
+        Intent srcIntent = getIntent();
+        intent.putExtra("musicMode", srcIntent.getStringExtra("musicMode"));
+        intent.putExtra("username", srcIntent.getStringExtra("username"));
+
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * 跳转到难度选择等待界面
+     */
+    private void goToRoomWaiting(String myName, String opponentName) {
+        Intent intent = new Intent(OnlineLobbyActivity.this, OnlineRoomWaitingActivity.class);
+        intent.putExtra("playerName", myName);
+        intent.putExtra("opponentName", opponentName);
+
         Intent srcIntent = getIntent();
         intent.putExtra("musicMode", srcIntent.getStringExtra("musicMode"));
         intent.putExtra("username", srcIntent.getStringExtra("username"));

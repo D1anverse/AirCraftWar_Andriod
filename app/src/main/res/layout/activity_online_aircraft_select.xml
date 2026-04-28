@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#1a1a2e"
+    android:padding="24dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择你的战机"
+        android:textColor="#FFFFFF"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- 战机预览 -->
+    <ImageView
+        android:id="@+id/iv_hero_preview"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="战机预览" />
+
+    <!-- 战机名称 -->
+    <TextView
+        android:id="@+id/tv_hero_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="基础型"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp" />
+
+    <!-- 战机描述 -->
+    <TextView
+        android:id="@+id/tv_hero_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="基础型号 | 均衡型"
+        android:textColor="#AAAAAA"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- 战机选择 -->
+    <RadioGroup
+        android:id="@+id/radio_group_hero"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radio_hero_basic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="基础型"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:buttonTint="#4CAF50" />
+
+        <RadioButton
+            android:id="@+id/radio_hero_pro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="进阶型"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:buttonTint="#2196F3" />
+
+        <RadioButton
+            android:id="@+id/radio_hero_promax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="旗舰型"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:buttonTint="#FF9800" />
+
+    </RadioGroup>
+
+    <!-- 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#444444"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- 对手状态 -->
+    <TextView
+        android:id="@+id/tv_opponent_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="等待对手选择战机..."
+        android:textColor="#FFFF00"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <!-- 确认按钮 -->
+    <Button
+        android:id="@+id/btn_confirm"
+        android:layout_width="240dp"
+        android:layout_height="56dp"
+        android:text="确认选择"
+        android:textSize="18sp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#4CAF50" />
+
+    <!-- 返回按钮 -->
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="240dp"
+        android:layout_height="48dp"
+        android:text="返回大厅"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#666666" />
+
+</LinearLayout>

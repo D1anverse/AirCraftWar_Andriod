@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +16,7 @@ import edu.hitsz.application.GameEasy;
 import edu.hitsz.application.GameNormal;
 import edu.hitsz.application.GameHard;
 import edu.hitsz.application.GameConfig;
+import edu.hitsz.aircraft.HeroType;
 import edu.hitsz.R;
 
 /**
@@ -41,6 +44,7 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
     private String username;           // 原始用户名
     private String musicMode;          // 音乐开关
     private String difficulty = "normal"; // 默认普通难度
+    private String heroType = "hero";  // 默认基础型
 
     // 对手数据
     private int opponentScore = 0;
@@ -56,6 +60,18 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
     // Socket客户端
     private SocketClient socketClient;
 
+    // 重连机制
+    private Handler reconnectHandler = new Handler(Looper.getMainLooper());
+    private boolean isReconnecting = false;
+    private int reconnectAttempts = 0;
+    private static final int MAX_RECONNECT_ATTEMPTS = 10;
+    private static final long RECONNECT_INTERVAL = 3000; // 3秒重试一次
+
+    // 心跳保活机制
+    private static final long HEARTBEAT_INTERVAL = 10000; // 10秒发送一次心跳
+    private Handler heartbeatHandler = new Handler(Looper.getMainLooper());
+    private boolean isHeartbeatRunning = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +83,17 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
         opponentName = intent.getStringExtra("opponentName");
         username = intent.getStringExtra("username");
         musicMode = intent.getStringExtra("musicMode");
+        difficulty = intent.getStringExtra("difficulty");
+        heroType = intent.getStringExtra("heroType");
+
         if (musicMode == null) musicMode = "ON";
         if (username == null || username.isEmpty()) username = playerName;
+        if (difficulty == null) difficulty = "normal";
+        if (heroType == null) heroType = "hero";
+
+        // 设置选定的英雄机类型
+        edu.hitsz.aircraft.HeroType selectedType = edu.hitsz.aircraft.HeroType.fromTypeId(heroType);
+        GameConfig.getInstance().setSelectedHeroType(selectedType);
 
         // 绑定UI控件
         gameContainer = findViewById(R.id.game_view_container);
@@ -91,7 +116,45 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
 
         // 设置网络监听
         setupNetworkListener();
+
+        // 启动心跳保活
+        startHeartbeat();
     }
+
+    /**
+     * 启动心跳保活定时器
+     */
+    private void startHeartbeat() {
+        if (isHeartbeatRunning) return;
+        isHeartbeatRunning = true;
+        heartbeatHandler.postDelayed(heartbeatRunnable, HEARTBEAT_INTERVAL);
+    }
+
+    /**
+     * 停止心跳保活
+     */
+    private void stopHeartbeat() {
+        isHeartbeatRunning = false;
+        heartbeatHandler.removeCallbacks(heartbeatRunnable);
+    }
+
+    /**
+     * 心跳任务 - 定期发送心跳包保持连接
+     */
+    private Runnable heartbeatRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isHeartbeatRunning || matchEnded) {
+                return;
+            }
+            // 发送心跳包
+            if (socketClient != null && socketClient.connected()) {
+                socketClient.sendMessage("HEARTBEAT", "");
+            }
+            // 继续发送下一个心跳
+            heartbeatHandler.postDelayed(this, HEARTBEAT_INTERVAL);
+        }
+    };
 
     /**
      * 创建游戏视图并注册回调
@@ -137,10 +200,14 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
             @Override
             public void onDisconnected() {
                 runOnUiThread(() -> {
-                    tvConnStatus.setText("[Disconnected]");
-                    tvConnStatus.setTextColor(0xFFFF0000);
+                    // 停止心跳
+                    stopHeartbeat();
+                    tvConnStatus.setText("[Reconnecting...]");
+                    tvConnStatus.setTextColor(0xFFFFAA00);
                     Toast.makeText(GameOnlineActivity.this,
-                            "Connection lost!", Toast.LENGTH_LONG).show();
+                            "Connection lost! Attempting to reconnect...", Toast.LENGTH_SHORT).show();
+                    // 启动重连机制
+                    startReconnection();
                 });
             }
         });
@@ -244,8 +311,94 @@ public class GameOnlineActivity extends AppCompatActivity implements Game.GameOv
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 停止心跳
+        stopHeartbeat();
+        // 停止重连机制
+        stopReconnection();
+        // ★ 修复2: 离开房间并断开连接，防止服务端残留房间状态影响下一次匹配
+        if (socketClient != null) {
+            socketClient.leaveRoom();
+            socketClient.disconnect();
+        }
         if (gameView != null) {
             gameView.clearEnemyScore();
         }
     }
+
+    /**
+     * 启动自动重连机制
+     */
+    private void startReconnection() {
+        if (isReconnecting) return;
+        isReconnecting = true;
+        reconnectAttempts = 0;
+
+        reconnectHandler.postDelayed(reconnectRunnable, RECONNECT_INTERVAL);
+    }
+
+    /**
+     * 停止自动重连机制
+     */
+    private void stopReconnection() {
+        isReconnecting = false;
+        reconnectHandler.removeCallbacks(reconnectRunnable);
+    }
+
+    /**
+     * 重连任务
+     */
+    private Runnable reconnectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // 检查 Activity 是否已销毁或游戏已结束
+            if (!isReconnecting || matchEnded || isFinishing() || isDestroyed()) {
+                isReconnecting = false;
+                return;
+            }
+
+            reconnectAttempts++;
+
+            if (reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
+                // 重连次数用尽
+                runOnUiThread(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        tvConnStatus.setText("[Disconnected]");
+                        tvConnStatus.setTextColor(0xFFFF0000);
+                        Toast.makeText(GameOnlineActivity.this,
+                                "Reconnection failed. Please restart.", Toast.LENGTH_LONG).show();
+                    }
+                });
+                isReconnecting = false;
+                return;
+            }
+
+            // 尝试重连
+            SocketClient.getInstance().ensureConnected(success -> {
+                runOnUiThread(() -> {
+                    // 再次检查 Activity 状态
+                    if (isFinishing() || isDestroyed() || matchEnded) {
+                        isReconnecting = false;
+                        return;
+                    }
+
+                    if (success) {
+                        // 重连成功
+                        isReconnecting = false;
+                        reconnectAttempts = 0;
+                        tvConnStatus.setText("[Reconnected]");
+                        tvConnStatus.setTextColor(0xFF00FF00);
+                        Toast.makeText(GameOnlineActivity.this,
+                                "Reconnected successfully!", Toast.LENGTH_SHORT).show();
+
+                        // 重新启动心跳
+                        startHeartbeat();
+                    } else {
+                        // 重连失败，继续重试
+                        tvConnStatus.setText("[Reconnecting... " + reconnectAttempts + "/" + MAX_RECONNECT_ATTEMPTS + "]");
+                        reconnectHandler.postDelayed(this, RECONNECT_INTERVAL);
+                    }
+                });
+            });
+        }
+    };
 }

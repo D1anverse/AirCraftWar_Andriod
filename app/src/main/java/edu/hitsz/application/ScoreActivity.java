@@ -2,7 +2,9 @@ package edu.hitsz.application;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,9 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
+import edu.hitsz.dao.PlayerDataManager;
 import edu.hitsz.dao.Score;
 import edu.hitsz.dao.ScoreDAOImpl;
 import edu.hitsz.R;
+import edu.hitsz.network.SocketClient;
 
 public class ScoreActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -39,6 +43,10 @@ public class ScoreActivity extends AppCompatActivity {
                 currentDifficulty = difficulty;
             }
             scoreDAO.addScore(new Score(userName, currentScore));
+
+            // 计算并同步代币
+            int earnedCoins = calculateCoins(currentScore, currentDifficulty);
+            syncCoinsToServer(earnedCoins);
         }
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -128,5 +136,85 @@ public class ScoreActivity extends AppCompatActivity {
 
     public void refreshData() {
         loadScores();
+    }
+
+    /**
+     * 根据难度系数计算代币
+     * 简单=1:1，普通=1:1.5，困难=1:2
+     */
+    private int calculateCoins(int score, String difficulty) {
+        switch (difficulty) {
+            case "easy":
+                return score;
+            case "hard":
+                return score * 2;
+            case "normal":
+            default:
+                return (int) (score * 1.5f);
+        }
+    }
+
+    /**
+     * 同步代币到服务器
+     * 优先实时同步，如果未连接则本地缓存
+     * 同时写入本地 SQLite，确保商店能读取到最新代币
+     */
+    private void syncCoinsToServer(int coins) {
+        UserSessionManager session = UserSessionManager.getInstance(this);
+        int userId = session.getUserId();
+
+        // 先显示获得的代币提示
+        Toast.makeText(ScoreActivity.this, "获得 +" + coins + " 代币！", Toast.LENGTH_SHORT).show();
+
+        // ★ 同时写入本地 SQLite，确保商店页面能立即看到最新代币
+        if (userId > 0) {
+            PlayerDataManager localDB = new PlayerDataManager(this);
+            localDB.addCoins(userId, coins);
+        }
+
+        if (!session.isLoggedIn() || userId <= 0) {
+            Log.e("ScoreActivity", "用户未登录，代币仅本地缓存");
+            return;
+        }
+
+        SocketClient client = SocketClient.getInstance();
+
+        if (client.connected()) {
+            // 在线模式：直接同步
+            // 先同步待缓存的代币
+            int pendingCoins = session.getPendingCoins();
+            if (pendingCoins > 0) {
+                client.sendMessage("SYNC_COINS", userId + "," + pendingCoins);
+            }
+            // 再同步当前代币
+            client.sendMessage("SYNC_COINS", userId + "," + coins);
+
+            client.setMessageListener(new SocketClient.OnMessageReceivedListener() {
+                @Override
+                public void onMessageReceived(String type, String body) {
+                    if ("SYNC_OK".equals(type)) {
+                        runOnUiThread(() -> {
+                            int totalCoins = coins + session.getPendingCoins();
+                            session.saveServerCoins(session.getCachedCoins() + totalCoins);
+                            session.clearPendingCoins();
+                            Log.d("ScoreActivity", "代币同步成功: +" + totalCoins);
+                        });
+                    }
+                }
+
+                @Override
+                public void onDisconnected() {
+                    // 离线了，缓存代币
+                    runOnUiThread(() -> {
+                        session.addPendingCoins(coins);
+                        Log.e("ScoreActivity", "连接断开，代币已本地缓存");
+                    });
+                }
+            });
+        } else {
+            // 离线模式：本地缓存
+            session.addPendingCoins(coins);
+            Log.d("ScoreActivity", "离线模式，代币已本地缓存，累计: " + session.getPendingCoins());
+        }
     }
 }

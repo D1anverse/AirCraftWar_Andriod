@@ -11,20 +11,24 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyAirCraftWar"
         android:usesCleartextTraffic="true">
 
         <!-- 启动 Activity：MenuActivity -->
+
         <activity
-            android:name=".application.MenuActivity"
+            android:name=".application.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".application.MenuActivity"
+            android:exported="true" />
 
         <!-- 游戏界面 Activity -->
         <activity
@@ -44,6 +48,16 @@
             android:name=".network.OnlineLobbyActivity"
             android:exported="false" />
 
+        <!-- 联机房间等待（难度选择） -->
+        <activity
+            android:name=".network.OnlineRoomWaitingActivity"
+            android:exported="false" />
+
+        <!-- 联机飞机选择 -->
+        <activity
+            android:name=".network.OnlineAircraftSelectActivity"
+            android:exported="false" />
+
         <!-- 在线对战游戏界面 -->
         <activity
             android:name=".network.GameOnlineActivity"
@@ -52,6 +66,14 @@
         <!-- 联机对战结果页面 -->
         <activity
             android:name=".network.GameResultActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".application.ShopActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".application.FriendActivity"
             android:exported="false" />
 
     </application>

@@ -28,7 +28,7 @@ public class SocketClient {
     private static final String TAG = "SocketClient";
 
     /** 默认服务器地址（测试用，实际使用时由用户输入） */
-    private static final String DEFAULT_SERVER_IP = "192.168.1.100";
+    private static final String DEFAULT_SERVER_IP = "10.250.88.235";
     private static final int DEFAULT_SERVER_PORT = 8080;
 
     // 单例模式
@@ -37,7 +37,11 @@ public class SocketClient {
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
-    private boolean isConnected = false;
+    private volatile boolean isConnected = false;
+
+    // 保存连接时的服务器地址
+    private String lastConnectedIp;
+    private int lastConnectedPort;
 
     // 线程池：用于网络IO操作（不能在主线程做网络操作）
     private final ExecutorService executor = Executors.newCachedThreadPool();;
@@ -63,6 +67,9 @@ public class SocketClient {
 
     private OnMessageReceivedListener messageListener;
     private OnConnectionStateChangedListener connectionListener;
+
+    /** 一次性的查询回调（用于 ShopActivity 等临时查询） */
+    private OnMessageReceivedListener pendingQueryCallback;
 
     // 单例获取
 
@@ -91,12 +98,19 @@ public class SocketClient {
             try {
                 Log.d(TAG, "正在连接: " + serverIp + ":" + port);
 
+                // ★ 修复1: 先关闭旧连接，防止重复连接导致服务端残留旧handler
+                resetConnection();
+
                 socket = new Socket();
                 socket.connect(new InetSocketAddress(serverIp, port), 8000); // 8秒连接超时
 
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new PrintWriter(socket.getOutputStream(), true);
                 isConnected = true;
+
+                // 保存连接地址（用于重连）
+                lastConnectedIp = serverIp;
+                lastConnectedPort = port;
 
                 Log.d(TAG, "连接成功!");
 
@@ -152,7 +166,10 @@ public class SocketClient {
 
                         // 切换到UI线程回调
                         mainHandler.post(() -> {
-                            if (messageListener != null) {
+                            // 优先派发给一次性查询回调（用于临时查询如 QUERY_COINS）
+                            if (pendingQueryCallback != null) {
+                                pendingQueryCallback.onMessageReceived(type, body);
+                            } else if (messageListener != null) {
                                 messageListener.onMessageReceived(type, body);
                             }
                         });
@@ -217,6 +234,85 @@ public class SocketClient {
     }
 
     /**
+     * 用户登录
+     * 发送：LOGIN|nickname,password
+     * 期望返回：LOGIN_SUCCESS|userId,nickname,email  或  LOGIN_ERROR|reason
+     */
+    public void sendLogin(String nickname, String password) {
+        sendMessage("LOGIN", nickname + "," + password);
+    }
+
+    /**
+     * 用户注册
+     * 发送：REGISTER|nickname,email,password
+     * 期望返回：REGISTER_SUCCESS|userId,nickname,email  或  REGISTER_ERROR|reason
+     */
+    public void sendRegister(String nickname, String email, String password) {
+        sendMessage("REGISTER", nickname + "," + email + "," + password);
+    }
+
+    /**
+     * 搜索用户
+     * 发送：SEARCH_USER|keyword
+     * 期望返回：SEARCH_RESULT|userId,nickname,status
+     */
+    public void sendSearchUser(String keyword) {
+        sendMessage("SEARCH_USER", keyword);
+    }
+
+    /**
+     * 添加好友
+     * 发送：ADD_FRIEND|myUserId,friendId
+     * 期望返回：ADD_FRIEND_OK  或  ADD_FRIEND_FAIL|reason
+     */
+    public void sendAddFriend(int myUserId, int targetUserId) {
+        sendMessage("ADD_FRIEND", myUserId + "," + targetUserId);
+    }
+
+    /**
+     * 获取好友列表
+     * 发送：GET_FRIENDS|userId
+     * 期望返回：FRIEND_LIST|数据（多条用换行分隔）
+     */
+    public void sendGetFriends(int userId) {
+        sendMessage("GET_FRIENDS", String.valueOf(userId));
+    }
+
+    /**
+     * 邀请好友对战
+     * 发送：INVITE_FRIEND|fromUserId,toUserId
+     * 期望返回：INVITE_SENT  或  INVITE_FAIL|reason
+     */
+    public void sendInviteFriend(int fromUserId, int toUserId) {
+        sendMessage("INVITE_FRIEND", fromUserId + "," + toUserId);
+    }
+
+    /**
+     * 接受/拒绝邀请
+     * 发送：RESPOND_INVITE|toUserId,ACCEPT/REJECT
+     */
+    public void sendRespondInvite(int toUserId, boolean accept) {
+        sendMessage("RESPOND_INVITE", toUserId + "," + (accept ? "ACCEPT" : "REJECT"));
+    }
+
+    /**
+     * 商店购买同步
+     * 发送：BUY_AIRCRAFT|userId,aircraftType(PRO/PROMAX)
+     * 期望返回：BUY_OK  或  BUY_FAIL|reason
+     */
+    public void sendBuyAircraft(int userId, String aircraftType) {
+        sendMessage("BUY_AIRCRAFT", userId + "," + aircraftType);
+    }
+
+    /**
+     * 上报代币变动（游戏结束/其他场景）
+     * 发送：SYNC_COINS|userId,coinAmount
+     */
+    public void sendSyncCoins(int userId, int coinAmount) {
+        sendMessage("SYNC_COINS", userId + "," + coinAmount);
+    }
+
+    /**
      * 断开连接
      */
     public void disconnect() {
@@ -230,6 +326,88 @@ public class SocketClient {
                 Log.e(TAG, "关闭连接异常: " + e.getMessage());
             }
         });
+    }
+
+    /**
+     * 重置连接状态（用于应用重启时强制重连）
+     * 同步执行，确保立即断开旧连接
+     */
+    public void resetConnection() {
+        synchronized (this) {
+            isConnected = false;
+            try {
+                if (socket != null && !socket.isClosed()) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "关闭连接异常: " + e.getMessage());
+            }
+            socket = null;
+            reader = null;
+            writer = null;
+            Log.d(TAG, "连接状态已重置");
+        }
+    }
+
+    /**
+     * 确保连接正常（如果断开则尝试重连）
+     * @param callback 连接状态回调
+     */
+    public void ensureConnected(ConnectionCallback callback) {
+        // 如果已经连接，直接回调成功
+        if (isConnected && socket != null && !socket.isClosed()) {
+            Log.d(TAG, "当前已连接，直接返回成功");
+            callback.onResult(true);
+            return;
+        }
+
+        // 保存原有的监听器
+        final OnConnectionStateChangedListener originalListener = connectionListener;
+        final OnMessageReceivedListener originalMessageListener = messageListener;
+
+        // 先关闭旧连接
+        resetConnection();
+
+        // 延迟一点再尝试连接，确保旧连接已完全关闭
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            String ip = (lastConnectedIp != null) ? lastConnectedIp : DEFAULT_SERVER_IP;
+            int port = (lastConnectedPort > 0) ? lastConnectedPort : DEFAULT_SERVER_PORT;
+
+            Log.d(TAG, "尝试连接到: " + ip + ":" + port);
+
+            // 设置临时回调用于重连
+            connectionListener = new OnConnectionStateChangedListener() {
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "重连成功!");
+                    // 恢复原有的监听器
+                    connectionListener = originalListener;
+                    messageListener = originalMessageListener;
+                    // 调用原有监听器
+                    if (originalListener != null) {
+                        originalListener.onConnected();
+                    }
+                    callback.onResult(true);
+                }
+
+                @Override
+                public void onDisconnected(String reason) {
+                    Log.e(TAG, "重连失败: " + reason);
+                    // 恢复原有的监听器
+                    connectionListener = originalListener;
+                    callback.onResult(false);
+                }
+            };
+
+            connect(ip, port);
+        }, 300);
+    }
+
+    /**
+     * 连接状态回调接口
+     */
+    public interface ConnectionCallback {
+        void onResult(boolean success);
     }
 
     // 状态查询
@@ -247,6 +425,60 @@ public class SocketClient {
 
     public void setConnectionListener(OnConnectionStateChangedListener listener) {
         this.connectionListener = listener;
+    }
+
+    /**
+     * 设置一次性查询回调（查询完成后自动清除，不会覆盖 setMessageListener）
+     * 常用于 ShopActivity 等临时向服务器请求数据
+     */
+    public void setQueryCallback(OnMessageReceivedListener callback) {
+        this.pendingQueryCallback = callback;
+    }
+
+    /** 清除一次性查询回调 */
+    public void clearQueryCallback() {
+        this.pendingQueryCallback = null;
+    }
+
+    /**
+     * 查询玩家代币数据
+     * 发送：QUERY_COINS|userId
+     * 期望返回：COINS_INFO|userId,coins,proUnlocked,promaxUnlocked
+     */
+    public void sendQueryCoins(int userId) {
+        sendMessage("QUERY_COINS", String.valueOf(userId));
+    }
+
+    /**
+     * 发送难度选择（联机对战）
+     * 发送：DIFFICULTY_SELECT|easy/normal/hard
+     */
+    public void sendDifficultySelect(String difficulty) {
+        sendMessage("DIFFICULTY_SELECT", difficulty);
+    }
+
+    /**
+     * 发送飞机选择（联机对战）
+     * 发送：AIRCRAFT_SELECT|heroTypeId
+     */
+    public void sendAircraftSelect(String heroTypeId) {
+        sendMessage("AIRCRAFT_SELECT", heroTypeId);
+    }
+
+    /**
+     * 发送确认完成（联机对战）
+     * 发送：PLAYER_READY
+     */
+    public void sendPlayerReady() {
+        sendMessage("PLAYER_READY", "");
+    }
+
+    /**
+     * 离开房间
+     * 发送：LEAVE_ROOM
+     */
+    public void leaveRoom() {
+        sendMessage("LEAVE_ROOM", "");
     }
 }
 
